@@ -10,7 +10,7 @@ function Login() {
         {/* Login with Spotify button */}
         
         <img src = {SpotifyLogo} alt="Spotify Logo"/>
-        <a href={loginUrl}>Login with Spotify</a>
+        <a href={loginUrl}>LOGIN WITH SPOTIFY</a>
     </div>
   )
 }

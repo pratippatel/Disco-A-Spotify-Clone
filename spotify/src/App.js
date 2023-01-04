@@ -1,12 +1,57 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 import Login from './Login';
+import { getTokenFromUrl } from './spotify';
+import SpotifyWebApi from "spotify-web-api-js";
+import Player from './Player';
+import {useDataLayerValue} from './DataLayer';
+
+const spotify = new SpotifyWebApi();
 
 function App() {
+   
+
+//const [token, setToken] = useState(null);
+//const [DataLayer, dispatch] = useDataLayerValue(); below we are only pulling the part of the data layer that is user 
+//you can get the whole object by the above syntax and access it lik dataLayer.user
+const [{user,token}, dispatch] = useDataLayerValue();
+
+//Run code based on a given condition
+useEffect(() => { 
+
+  //So basically when we redirect from login with spotify we will fetch the token and store it in the token state. 
+  //and in the jsx we will check if we have a token then we will go to player component or else the login component.
+  const hash = getTokenFromUrl();
+  window.location.hash = "";
+  const _token = hash.access_token;
+
+  if(_token){
+    //console.log(token);
+    dispatch({
+      type : "SET_TOKEN",
+      token: _token,
+    });
+    spotify.setAccessToken(_token);
+
+    spotify.getMe().then((user) => {
+      
+      dispatch({
+        type : "SET_USER",
+        user: user,
+      });
+    });
+  }
+  //console.log("I have token:",_token);
+},[dispatch]);  
+
+console.log("person", user);
   return (
     <div className="app">
-      
-      <Login/>
+      {
+        //check if we have token, if we have then we will render the player component or else we will login first.
+        token?(<Player spotify = {spotify}/>):(<Login/>)
+      }
+      {/* <Login/> */}
     </div>
   );
 }
